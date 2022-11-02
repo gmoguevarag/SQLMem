@@ -1,0 +1,18 @@
+--HOW TO GET SOME LINE ITEMS FROM A GIVEN SHIPMENT
+--REMEMBER THE FOLLWING STRUCTURE FOR A LEFT JOIN
+--SELECT column_name(s)
+--FROM table1
+--LEFT JOIN table2
+--ON table1.column_name = table2.column_name;
+
+SELECT legs.id as leg_id, 
+legs.shipment_id, 
+payable_line_items.id, 
+payable_line_items.cost_cents
+
+FROM legs
+
+LEFT JOIN payable_line_items
+ON legs.id = payable_line_items.leg_id
+
+WHERE legs.shipment_id = 8377
