@@ -1,0 +1,21 @@
+WITH tech_support_shipments as
+(
+SELECT 
+shipments.id as tech_support_shipments_shipment_id,
+shipments.route_id as tech_support_shipments_shipment_route,
+routes.company_id as tech_support_shipments_company_id
+FROM shipments
+LEFT JOIN routes 
+ON shipments.route_id = routes.id
+WHERE shipments.ready_for_pickup > 'October 15, 2022, 6:00 AM' 
+AND shipments.status = 'accepted'
+)
+
+SELECT 
+tech_support_shipments.tech_support_shipments_shipment_id,
+tech_support_shipments.tech_support_shipments_shipment_route,
+tech_support_shipments.tech_support_shipments_company_id,
+companies.legal_name as tech_support_shipments_company_legal_name
+FROM tech_support_shipments
+LEFT JOIN companies
+ON tech_support_shipments.tech_support_shipments_company_id = companies.id
