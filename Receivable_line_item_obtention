@@ -1,0 +1,13 @@
+SELECT legs.id as leg_id, 
+legs.shipment_id, 
+receivable_line_items.id, 
+receivable_line_items.price_in_usd,
+receivable_line_items.price_cents,
+receivable_line_items.currency
+
+FROM legs
+
+LEFT JOIN receivable_line_items
+ON legs.id = receivable_line_items.leg_id
+
+WHERE legs.shipment_id = 9072
