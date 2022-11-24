@@ -1,0 +1,10 @@
+select legs.id as leg_id
+, legs.shipment_id
+, payable_line_items.*
+from legs
+left join payable_line_items on legs.id = payable_line_items.leg_id
+where  approval_status = 'approved'
+and legs.shipment_id = 9148 or legs.shipment_id = 9167 or legs.shipment_id = 8137
+and payable_line_items.id notnull 
+
+order by 2
