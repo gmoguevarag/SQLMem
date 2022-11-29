@@ -1,0 +1,45 @@
+with dummy_carrier_metrics
+as
+(
+with dummy_carrier_usage
+as
+(
+With dummy_carrier_routes 
+as 
+(
+WITH LEGOR 
+AS 
+(
+SELECT legs.shipment_id as shipment_id
+, legs.id as leg_id
+, legs.origin_id as origin_id_legs
+, CONCAT (places.state, ' ' , places.city)  as place_name_origin
+, legs.destination_id as destination_id_legs
+from legs 
+left join places on legs.origin_id = places.id 
+--left join places on legs.destination_id = places.id 
+
+where legs.carrier_id = 7993 
+)
+SELECT LEGOR.*
+, CONCAT (places.state, ' ' , places.city)  as place_name_dest
+FROM LEGOR
+left join places on LEGOR.destination_id_legs = places.id 
+)
+
+SELECT dummy_carrier_routes.*
+, shipments.route_id  as route_with_dummy
+from dummy_carrier_routes 
+left join shipments on dummy_carrier_routes.shipment_id= shipments.id
+)
+
+SELECT dummy_carrier_usage.*
+, routes.company_id as company_id_used_for
+from dummy_carrier_usage 
+left join routes on dummy_carrier_usage.route_with_dummy = routes.id
+)
+
+Select dummy_carrier_metrics.* 
+, companies.legal_name as shipper
+from dummy_carrier_metrics
+left join companies on company_id_used_for = companies.id
