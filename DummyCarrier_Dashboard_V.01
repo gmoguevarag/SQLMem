@@ -12,6 +12,7 @@ AS
 (
 SELECT legs.shipment_id as shipment_id
 , legs.id as leg_id
+, legs.booking_date as booked_date
 , legs.origin_id as origin_id_legs
 , CONCAT (places.state, ' ' , places.city)  as place_name_origin
 , legs.destination_id as destination_id_legs
