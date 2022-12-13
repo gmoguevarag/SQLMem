@@ -2,6 +2,8 @@ with versions_finale as
 (
 select cast (versions.item_id as text) as item_id_text
 , cast (versions.whodunnit as int) as modifier
+, versions.created_at as created_at
+, versions.object_changes as changes
 from versions
 where item_type = 'ShipmentEvent'
 and event = 'update'
@@ -11,6 +13,8 @@ and event = 'update'
 (
 select versions_finale.item_id_text as item_id_txt
 , versions_finale.modifier as modifier_user
+, versions_finale.changes as changes_made
+, versions_finale.created_at as date_created 
 , users.email as email
 from versions_finale 
 left join users on versions_finale.modifier = users.id 
@@ -31,13 +35,21 @@ select shipment_events_id_in_text.leg_id as shipment_leg_id
 , versions_with_useremail.item_id_txt as shipment_eventid
 , versions_with_useremail.modifier_user as Who_did_it
 , versions_with_useremail.email as user_email
+, versions_with_useremail.changes_made as changes_performed
+, versions_with_useremail.date_created as created_date
 from versions_with_useremail
 left join shipment_events_id_in_text on versions_with_useremail.item_id_txt = shipment_events_id_in_text.id_text
 )
-
+, almost_done as 
+(
 select legs.shipment_id 
 , shipment_events_with_user.* 
 from shipment_events_with_user
 left join legs on shipment_events_with_user.shipment_leg_id = legs.id
-where legs.shipment_id = 9402
-order by 4
+where legs.shipment_id = 9734
+order by created_date
+)
+
+select *
+from almost_done
+where Who_did_it is not null
