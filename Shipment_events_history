@@ -8,48 +8,53 @@ from versions
 where item_type = 'ShipmentEvent'
 and event = 'update'
 )
-
-, versions_with_useremail as 
+, versions_with_useremail as
 (
 select versions_finale.item_id_text as item_id_txt
 , versions_finale.modifier as modifier_user
 , versions_finale.changes as changes_made
-, versions_finale.created_at as date_created 
+, versions_finale.created_at as date_created
 , users.email as email
-from versions_finale 
-left join users on versions_finale.modifier = users.id 
+, users.first_name as user_name
+, users.last_name as user_last_name
+from versions_finale
+left join users on versions_finale.modifier = users.id
 )
-, shipment_events_id_in_text as 
-
+, shipment_events_id_in_text as
 (
 select cast (id as text) as id_text
-, shipment_events.leg_id as leg_id 
-, shipment_events.type as event 
+, shipment_events.leg_id as leg_id
+, shipment_events.type as event
 from shipment_events
 )
-
 , shipment_events_with_user as (
-
 select shipment_events_id_in_text.leg_id as shipment_leg_id
 , shipment_events_id_in_text.event as event_type
 , versions_with_useremail.item_id_txt as shipment_eventid
 , versions_with_useremail.modifier_user as Who_did_it
+, versions_with_useremail.user_name as name
+, versions_with_useremail.user_last_name as last_name
 , versions_with_useremail.email as user_email
 , versions_with_useremail.changes_made as changes_performed
 , versions_with_useremail.date_created as created_date
 from versions_with_useremail
 left join shipment_events_id_in_text on versions_with_useremail.item_id_txt = shipment_events_id_in_text.id_text
 )
-, almost_done as 
+, obtain as
 (
-select legs.shipment_id 
-, shipment_events_with_user.* 
+select legs.shipment_id
+, shipment_events_with_user.shipment_leg_id
+, shipment_events_with_user.event_type
+, concat ( shipment_events_with_user.name , ' ' , shipment_events_with_user.last_name) as full_name
+, shipment_events_with_user.changes_performed
+, shipment_events_with_user.created_date
 from shipment_events_with_user
 left join legs on shipment_events_with_user.shipment_leg_id = legs.id
-where legs.shipment_id = 9734
+where shipment_events_with_user.who_did_it is not null 
+and 
+legs.shipment_id = 9707
 order by created_date
 )
 
 select *
-from almost_done
-where Who_did_it is not null
+from obtain
